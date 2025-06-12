@@ -31,7 +31,7 @@
         }
     },
     "scripts": {
-        "cs": "php-cs-fixer fix --dry-run --diff --verbose",
+        "cs-check": "php-cs-fixer fix --dry-run --diff --verbose",
         "cs-fix": "php-cs-fixer fix --verbose",
         "phpstan": "phpstan analyse --memory-limit=1G",
         "test": "phpstan analyse --memory-limit=1G"
