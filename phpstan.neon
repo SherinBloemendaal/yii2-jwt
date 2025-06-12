@@ -1,0 +1,8 @@
+parameters:
+    level: 10
+    paths:
+        - src
+    excludePaths:
+        - vendor
+    ignoreErrors:
+        - '#Call to static method warning\(\) on an unknown class Yii#' 

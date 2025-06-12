@@ -1,0 +1,46 @@
+{
+    "name": "sherinbloemendaal/yii2-jwt",
+    "description": "JWT Authentication for Yii2",
+	"type": "yii2-extension",
+	"keywords": ["yii2", "yii 2", "jwt"],
+	"authors": [
+        {
+            "name": "Sherin Bloemendaal",
+            "email": "sherin@bloemendaal.dev",
+            "homepage": "https://bloemendaal.dev"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "lcobucci/jwt": "^5.0",
+        "yiisoft/yii2": "^2.0.52",
+        "yidas/yii2-composer-bower-skip": "^2.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.59",
+        "phpstan/phpstan": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "sherinbloemendaal\\jwt\\": "src"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        }
+    },
+    "scripts": {
+        "cs": "php-cs-fixer fix --dry-run --diff --verbose",
+        "cs-fix": "php-cs-fixer fix --verbose",
+        "phpstan": "phpstan analyse --memory-limit=1G",
+        "test": "phpstan analyse --memory-limit=1G"
+    },
+    "license": "MIT",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
+}
