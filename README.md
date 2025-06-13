@@ -55,6 +55,14 @@
 - ![Yii2](https://img.shields.io/badge/Yii2-2.0.52+-0073E6?style=flat) Yii2 ^2.0.52
 - ![JWT](https://img.shields.io/badge/lcobucci/jwt-5.0+-000000?style=flat) lcobucci/jwt ^5.0
 
+### Optional Dependencies
+
+For time-based validation constraints, you may want to install a PSR-20 clock implementation:
+
+```bash
+composer require lcobucci/clock
+```
+
 ---
 
 ## 📦 Installation
@@ -81,9 +89,7 @@ Add to your Yii2 application configuration:
         'signerKey' => \sherinbloemendaal\jwt\JwtKey::PLAIN_TEXT,
         'signerKeyContents' => getenv('JWT_SECRET') ?: 'your-secret-key',
         'constraints' => [
-            static fn() => new \Lcobucci\JWT\Validation\Constraint\LooseValidAt(
-                \Lcobucci\Clock\SystemClock::fromUTC()
-            ),
+            static fn() => new \Lcobucci\JWT\Validation\Constraint\IssuedBy('https://your-app.com'),
         ],
     ],
 ],
@@ -147,16 +153,45 @@ try {
     
     // Validation constraints
     'constraints' => [
-        // Validate issued/expires dates
-        static fn() => new \Lcobucci\JWT\Validation\Constraint\LooseValidAt(
-            \Lcobucci\Clock\SystemClock::fromUTC()
-        ),
-        // Validate issuer
         static fn() => new \Lcobucci\JWT\Validation\Constraint\IssuedBy('https://your-app.com'),
-        // Validate audience
-        static fn() => new \Lcobucci\JWT\Validation\Constraint\PermittedFor('https://api.your-app.com'),
     ],
 ],
+```
+
+### Clock Implementations (Optional)
+
+For time-based JWT validation (checking expiration, not-before, issued-at claims), you need a PSR-20 compatible clock:
+
+**Option 1: Using lcobucci/clock (Recommended for time validation)**
+```bash
+composer require lcobucci/clock
+```
+
+```php
+// Time-based validation with SystemClock
+static fn() => new \Lcobucci\JWT\Validation\Constraint\LooseValidAt(
+    \Lcobucci\Clock\SystemClock::fromUTC()
+),
+
+// With leeway for clock skew
+static fn() => new \Lcobucci\JWT\Validation\Constraint\LooseValidAt(
+    \Lcobucci\Clock\SystemClock::fromUTC(),
+    new \DateInterval('PT30S') // 30 second leeway
+),
+```
+
+**Option 2: Built-in PSR-20 Implementation (no dependencies)**
+```php
+static function() {
+    return new \Lcobucci\JWT\Validation\Constraint\LooseValidAt(
+        new class implements \Psr\Clock\ClockInterface {
+            public function now(): \DateTimeImmutable
+            {
+                return new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+            }
+        }
+    );
+},
 ```
 
 ### Advanced Configuration
@@ -268,11 +303,11 @@ class ApiController extends Controller
 'jwt' => [
     'class' => \sherinbloemendaal\jwt\Jwt::class,
     'constraints' => [
-        // Time-based validation with leeway
-        static fn() => new \Lcobucci\JWT\Validation\Constraint\LooseValidAt(
-            \Lcobucci\Clock\SystemClock::fromUTC(),
-            new DateInterval('PT30S') // 30 second leeway
-        ),
+        // Validate issuer
+        static fn() => new \Lcobucci\JWT\Validation\Constraint\IssuedBy('https://your-app.com'),
+        
+        // Validate audience  
+        static fn() => new \Lcobucci\JWT\Validation\Constraint\PermittedFor('https://api.your-app.com'),
         
         // Custom constraint
         static function() {
